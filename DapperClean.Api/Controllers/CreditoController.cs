@@ -1,6 +1,7 @@
 ﻿using DapperClean.Api.Models;
 using DapperClean.Application.Interfaces;
 using DapperClean.Core.Entities;
+using DapperClean.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -8,29 +9,33 @@ namespace DapperClean.Api.Controllers
 {
     public class CreditoController : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
+        //private readonly IUnitOfWork _unitOfWork;
 
-        public CreditoController(IUnitOfWork unitOfWork)
+        public CreditoController()
         {
-            this._unitOfWork = unitOfWork;
+           // this._unitOfWork = unitOfWork;
         }
 
         [HttpGet]
-        public async Task<ApiResponse<List<Credito>>> GetAll()
+        public async Task<ApiResponse<List<Cliente>>> GetAll()
         {
-            var apiResponse = new ApiResponse<List<Credito>>();
+            var apiResponse = new ApiResponse<List<Cliente>>();
 
-            try
+            using (var unitOfWork = new UnitOfWork(@"Data Source=.\;Initial Catalog=dapper-test;Integrated Security=True;Encrypt=False;MultipleActiveResultSets=True"))
             {
-                var data = await _unitOfWork.Creditos.GetAllAsync();
-                apiResponse.Success = true;
-                apiResponse.Result = data.ToList();
+                var newCredito = new Credito
+                {
+                    Cuotas = 1,
+                    Interes = 0,
+                    Valor = 100000
+                };
+                var newCliente = new Cliente { Edad = 25, Nombre = "Fabian Zapata" };
+                await unitOfWork.CreditoRepository.AddAsync(newCredito);
+                await unitOfWork.ClienteRepository.AddAsync(newCliente);
+
+                unitOfWork.Commit();
             }
-            catch (Exception ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.Message = ex.Message;
-            }
+
 
             return apiResponse;
         }
