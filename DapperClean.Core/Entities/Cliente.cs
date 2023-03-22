@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace DapperClean.Core.Entities
 {
-    public class Credito
+    public class Cliente
     {
         public int Id { get; set; }
-        public int Valor { get; set; }
-        public float Interes { get; set;}
-        public int Cuotas { get; set; }
+        public string Nombre { get; set; }
+        public int Edad { get; set; }
     }
 }

@@ -10,7 +10,7 @@ namespace DapperClean.Sql.Queries
     {
         public static string AllCreditos => "SELECT * FROM [Credito] (NOLOCK)";
 
-        public static string CreditoById => "SELECT * FROM [Credito] (NOLOCK) WHERE [CreditoId] = @CreditoId";
+        public static string CreditoById => "SELECT * FROM [Credito] (NOLOCK) WHERE [Id] = @CreditoId";
 
         public static string AddCredito =>
             @"INSERT INTO [Credito] ([Valor], [Interes], [Cuotas]) 
@@ -21,8 +21,8 @@ namespace DapperClean.Sql.Queries
         SET [Valor] = @Valor, 
             [Interes] = @Interes, 
             [Cuotas] = @Cuotas, 
-        WHERE [CreditoId] = @CreditoId";
+        WHERE [Id] = @CreditoId";
 
-        public static string DeleteCredito => "DELETE FROM [Credito] WHERE [CreditoId] = @CreditoId";
+        public static string DeleteCredito => "DELETE FROM [Credito] WHERE [Id] = @CreditoId";
     }
 }

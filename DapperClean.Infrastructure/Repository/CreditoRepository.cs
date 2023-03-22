@@ -8,8 +8,8 @@ using Dapper;
 using DapperClean.Application.Interfaces;
 using DapperClean.Core.Entities;
 using DapperClean.Sql.Queries;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Npgsql;
 
 namespace DapperClean.Infrastructure.Repository
 {
@@ -17,64 +17,45 @@ namespace DapperClean.Infrastructure.Repository
     {
         #region Private Members
 
-        private readonly IConfiguration configuration;
+        private IDbTransaction _transaction;
+        private IDbConnection _connection { get { return _transaction.Connection; } }
 
         #endregion
-        public CreditoRepository(IConfiguration configuration)
+        public CreditoRepository(IDbTransaction transaction)
         {
-            this.configuration = configuration;
+            _transaction = transaction;
         }
 
         #region ICreditotRepository Methods
 
         public async Task<IReadOnlyList<Credito>> GetAllAsync()
         {
-            using (IDbConnection connection = new NpgsqlConnection(configuration.GetConnectionString("DBConnection")))
-            {
-                connection.Open();
-                var result = await connection.QueryAsync<Credito>(CreditoQueries.AllCreditos);
-                return result.ToList();
-            }
+            var result = await _connection.QueryAsync<Credito>(CreditoQueries.AllCreditos, _transaction);
+            return result.ToList();
         }
 
         public async Task<Credito> GetByIdAsync(long id)
         {
-            using (IDbConnection connection = new NpgsqlConnection(configuration.GetConnectionString("DBConnection")))
-            {
-                connection.Open();
-                var result = await connection.QuerySingleOrDefaultAsync<Credito>(CreditoQueries.CreditoById, new { CreditoId = id });
-                return result;
-            }
+            var result = await _connection.QuerySingleOrDefaultAsync<Credito>(CreditoQueries.CreditoById, new { CreditoId = id }, _transaction);
+            return result;
         }
 
         public async Task<string> AddAsync(Credito entity)
         {
-            using (IDbConnection connection = new NpgsqlConnection(configuration.GetConnectionString("DBConnection")))
-            {
-                connection.Open();
-                var result = await connection.ExecuteAsync(CreditoQueries.AddCredito, entity);
-                return result.ToString();
-            }
+            var result = await _connection.ExecuteAsync(CreditoQueries.AddCredito, entity, _transaction);
+            return result.ToString();
         }
 
         public async Task<string> UpdateAsync(Credito entity)
         {
-            using (IDbConnection connection = new NpgsqlConnection(configuration.GetConnectionString("DBConnection")))
-            {
-                connection.Open();
-                var result = await connection.ExecuteAsync(CreditoQueries.UpdateCredito, entity);
-                return result.ToString();
-            }
+            var result = await _connection.ExecuteAsync(CreditoQueries.UpdateCredito, entity, _transaction);
+            return result.ToString();
         }
 
         public async Task<string> DeleteAsync(long id)
         {
-            using (IDbConnection connection = new NpgsqlConnection(configuration.GetConnectionString("DBConnection")))
-            {
-                connection.Open();
-                var result = await connection.ExecuteAsync(CreditoQueries.DeleteCredito, new { CreditoId = id });
-                return result.ToString();
-            }
+            var result = await _connection.ExecuteAsync(CreditoQueries.DeleteCredito, new { CreditoId = id}, _transaction);
+            return result.ToString();
         }
 
         #endregion

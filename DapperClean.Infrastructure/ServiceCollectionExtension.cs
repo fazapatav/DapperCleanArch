@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -15,8 +17,9 @@ namespace DapperClean.Infrastructure
     {
         public static void RegisterServices(this IServiceCollection services)
         {
-            services.AddTransient<ICreditoRepository, CreditoRepository>();
-            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            //services.AddScoped<ICreditoRepository, CreditoRepository>();        
+            //services.AddTransient<IUnitOfWork, UnitOfWork>();
         }
     }
 }
+
